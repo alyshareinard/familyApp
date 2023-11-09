@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-dependencies:
-  '@bulatdashiev/svelte-slider':
-    specifier: ^1.0.3
-    version: 1.0.3
-
 devDependencies:
   '@sveltejs/adapter-auto':
     specifier: ^2.0.0
@@ -47,10 +42,6 @@ packages:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.20
     dev: true
-
-  /@bulatdashiev/svelte-slider@1.0.3:
-    resolution: {integrity: sha512-GkVyqIjzQnqy0FQIm8wqRLIOFQBQ/Ewd381Y7KwABsSwiSu0eMYO0/8s4q/wlMDDb2/+U66rXlalaUokUfw8Vg==}
-    dev: false
 
   /@esbuild/android-arm64@0.18.20:
     resolution: {integrity: sha512-Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==}
