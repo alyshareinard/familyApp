@@ -11,7 +11,7 @@
         getMoodHistory(20)
         mounted=true
     })
-	let oldMoodValue = 30;
+	let oldMoodValue = 0;
 
 	$: if (moodValue[0] != oldMoodValue && mounted) {
 //		console.log('mood value has changed');
