@@ -1,10 +1,13 @@
 <script lang="ts">
-  //https://github.com/BulatDashiev/svelte-slider
+  
+  //adapted from https://github.com/BulatDashiev/svelte-slider
 	import { createEventDispatcher } from 'svelte';
 	import Thumb from './Thumb.svelte';
+  import { onMount } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 
+  let mounted: boolean = false;
 	let name: string[] = [];
 	let range: boolean = false;
 	let min: number = 0;
@@ -51,10 +54,15 @@
 		setPos(value);
 		setValue(pos);
 	}
-
+  
   $:if (!active) {
     myvalue=value;
   }
+
+
+
+
+
 </script>
 
 <input type="number" value={value[0]} name={name[0]} />
