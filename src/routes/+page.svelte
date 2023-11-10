@@ -42,7 +42,7 @@
         moodHistory.pop()
         moodHistory.unshift(value)
         moodHistory = [...moodHistory]
-		console.log(value);
+//		console.log(value);
 	}
 
 	async function getMoodHistory(numRecords: number) {
