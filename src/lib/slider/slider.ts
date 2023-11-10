@@ -40,8 +40,9 @@ function getOnMove(node: HTMLElement) {
 
   return function (e: TouchEvent | MouseEvent) {
     const { bottom, height } = track.getBoundingClientRect();
+    //setting this up so box doesn't go beyond top/bottom of thermometer
     const clickOffset = "touches" in e ? e.touches[0].clientY : e.clientY;
-    const clickPos = Math.min(Math.max((bottom - clickOffset) / height, 0), 1) || 0;
+    const clickPos = Math.min(Math.max((bottom - clickOffset) / height, 0.30), 0.93) || .1;
     node.dispatchEvent(new CustomEvent("drag", { detail: clickPos }));
   };
 }

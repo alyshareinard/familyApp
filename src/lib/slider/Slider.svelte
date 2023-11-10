@@ -1,23 +1,21 @@
 <script lang="ts">
-  
-  //adapted from https://github.com/BulatDashiev/svelte-slider
+	//adapted from https://github.com/BulatDashiev/svelte-slider
 	import { createEventDispatcher } from 'svelte';
 	import Thumb from './Thumb.svelte';
-  import { onMount } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 
-  let mounted: boolean = false;
+
 	let name: string[] = [];
 	let range: boolean = false;
-	let min: number = 0;
-	let max: number = 100;
+	let min: number = -47;
+	let max: number = 111;
 	let step: number = 1;
-	let value: number[] = [min, max];
-	let pos:number[];
+	let value: number[] = [0, 100];
+	let pos: number[];
 	let active: boolean = false;
 	let order: boolean = false;
-  let myvalue: number[] = [];
+	let myvalue: number[] = [];
 
 	export { name, range, min, max, step, value, order, myvalue };
 
@@ -32,11 +30,12 @@
 
 	function setValue(pos: number[]) {
 		const offset = min % step;
-		const width = max - min;
-  
+		const height = max - min;
+
 		value = pos
-			.map((v) => min + v * width)
+			.map((v) => min + v * height)
 			.map((v) => Math.round((v - offset) / step) * step + offset);
+
 		dispatch('input', value);
 	}
 
@@ -45,29 +44,35 @@
 	}
 
 	function checkPos(pos: number[]) {
-    console.log("in checkpos")
+		
 		return [Math.min(...pos), Math.max(...pos)];
 	}
 
 	function clamp() {
-    
 		setPos(value);
 		setValue(pos);
 	}
-  
-  $:if (!active) {
-    myvalue=value;
-  }
 
-
-
-
-
+	$: if (!active) {
+		myvalue = value;
+	}
 </script>
 
 <input type="number" value={value[0]} name={name[0]} />
 
 <div class="track">
+	<div class="line1" />
+  <div class="textbox1"><p >trés mal</p></div>
+  
+	<div class="line2" />
+  <div class="textbox2"> <p >mal</p></div>
+ 
+	<div class="line3" />
+  <div class="textbox3"><p >moyen</p></div>
+  
+	<div class="line4" />
+  <div class="textbox4"><p >bien</p></div>
+  
 	<div class="progress" style={progress} />
 	<Thumb bind:pos={pos[0]} on:active={({ detail: v }) => (active = v)}>
 		<slot name="top">
@@ -76,8 +81,8 @@
 			</slot>
 		</slot>
 	</Thumb>
-
 </div>
+<div class="bulb"></div>
 
 <style>
 	input {
@@ -85,12 +90,15 @@
 	}
 
 	.track {
-		margin:10% 10%;
+		margin: 10% 10%;
 		position: relative;
 		height: 400px;
-		width: 40px;
+		width: 60px;
 		border-radius: 100vh;
-		background: var(--track-bg, #ebebeb);
+    border-color:black;
+    border-width:5px;
+    border-style:solid;
+		background: linear-gradient(red, yellow, green);
 	}
 
 	.progress {
@@ -100,7 +108,7 @@
 		top: 0;
 		bottom: 0;
 		border-radius: 100vh;
-		background: var(--progress-bg, #8abdff);
+		
 	}
 
 	.thumb {
@@ -109,4 +117,46 @@
 		border-radius: 100vh;
 		background: var(--thumb-bg, #5784fd);
 	}
+	.line1,
+	.line2,
+	.line3,
+	.line4 {
+		background: black;
+		position: absolute;
+		left: 10%;
+		height: 2%;
+		width: 80%;
+	}
+	.line1 {
+		top: 20%;
+	}
+	.line2 {
+		top: 40%;
+	}
+	.line3 {
+		top: 60%;
+	}
+	.line4 {
+		top: 80%;
+	}
+
+  .textbox1, .textbox2, .textbox3, .textbox4 {
+    position: absolute;
+    width:100%;
+    justify-content:center;
+    text-align:center;
+  }
+
+  .textbox1 {
+    top:5%
+  }
+  .textbox2 {
+    top:25%
+  }
+  .textbox3 {
+    top:45%
+  }
+  .textbox4 {
+    top:65%
+  }
 </style>
