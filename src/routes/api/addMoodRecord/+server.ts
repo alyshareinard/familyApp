@@ -19,13 +19,14 @@ function getDateTime(date: Date = new Date()) {
 }
 export const POST: RequestHandler = async ({ request }) => {
 
-	const {mood, valid} = await request.json()
+	const {mood, valid, notes, userid} = await request.json()
 	const newMoodRecord = {
-		mood: Number(mood),
+		moodValue: Number(mood),
 		date: getDateTime(new Date()),
+		notes: notes,
 		valid: valid
 	};
-	kv.lpush('myMoodHistory', newMoodRecord);
+	kv.lpush('mood:'+userid, newMoodRecord);
 	return new Response (JSON.stringify(newMoodRecord), { status: 200 });
 
 

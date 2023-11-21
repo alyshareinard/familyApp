@@ -1,112 +1,96 @@
 <script lang="ts">
-	import Slider from '$lib/slider/Slider.svelte';
+	import type { Login } from "$lib/interfaces/login";
+	
 	import { tick } from 'svelte';
-	import './global.css';
+	import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
-    let mounted:boolean=false
-    let showHistory:boolean=false
-	export let moodValue: number[] = [0, 100];
-	let moodHistory: { mood: number; date: string; valid: boolean }[];
-    onMount(async () => {
-        getMoodHistory(20)
-        mounted=true
+
+	let familyMembers: Login[] 
+	onMount(async () => {
+		//await createUsers() 
+		//await tick()
+        getUsers()
     })
-	let oldMoodValue = 0;
 
-	$: if (moodValue[0] != oldMoodValue && mounted) {
-//		console.log('mood value has changed');
-		//		moodHistory.unshift(newMoodRecord);
-
-		//moodHistory = [...moodHistory];
-		addMoodRecord(moodValue[0]);
-//		getMoodHistory(20);
-//		console.log("Mood history", moodHistory);
-		oldMoodValue = moodValue[0];
-	}
-
-	async function addMoodRecord(newMoodValue: number) {
-		const mood = newMoodValue;
-		const curdate = new Date();
-		const valid = true;
-
-		const response = await fetch('/api/addMoodRecord', {
-			method: 'POST',
-			body: JSON.stringify({ mood, curdate, valid }),
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
-
-		const value = await response.json();
-        await tick()
-        moodHistory.pop()
-        moodHistory.unshift(value)
-        moodHistory = [...moodHistory]
-//		console.log(value);
-	}
-
-	async function getMoodHistory(numRecords: number) {
-        await tick()
-		const response = await fetch('/api/getMoodHistory?numRecords=' + numRecords, {
-			method: 'GET',
+	async function createUsers() {
+		console.log("Starting createUsers")
+		const response = await fetch('/api/createUsers', {
+		method: 'POST',
 			body: null,
 			headers: {
 				'content-type': 'application/json'
 			}
 		});
-
 		const value = await response.json();
         await tick();
-        moodHistory = await value
-//        console.log("Value returned", moodHistory)
-		return
+		console.log("value from create is ", value)
+	}
+	
+	
+	async function getUsers() {
+		const response = await fetch('/api/getUsers', {
+		method: 'GET',
+			body: null,
+			headers: {
+				'content-type': 'application/json'
+			}
+		});
+		const value = await response.json();
+        await tick();
+		console.log("value is ", value)
+        familyMembers = await value
 	}
 
 
-</script>
-<h1>How are you?</h1>
-<button on:click={() => (showHistory = !showHistory)}>Show History</button>
-<div class="container">
-	<div>
-
-		<Slider bind:myvalue={moodValue}>
-			<span class="selectorBox">&#9744;</span>
-		</Slider>
-	</div>
+	let user: Login;
+    let password: string = '';
+	let message = ''
+	function assignUser(member: Login) {
+		
+		message=''
+		user = member;
+	}
+	function checkPassword() {
+		if (password == user.password){
+			localStorage.setItem("userid", user.id)
+			goto("/userpage")
+		} else {
+			message = "password incorrect"
+		}
+	}
     
-	<div>
-        {#if showHistory}
-		<h3>history</h3>
-		{#each moodHistory as history}
-			<div class="container">
-				<div class="column"><p>{history.mood}</p></div>
-				<div class="column"><p>{history.date}</p></div>
-			</div>
-		{/each}
-        {/if}
-	</div>
+</script>
+
+<h1>Welcome to the Family App</h1>
+
+<p>Click your name to login</p>
+<div class="familyContainer">
+	{#if familyMembers}
+	{#each familyMembers as member}
+		<button class="nameButton" on:click={() => assignUser(member)}>{member.name}</button>
+		{#if user == member}
+
+
+            <input bind:value={password} placeholder="password">
+
+			<button on:click = {() => checkPassword()}> login </button>
+			{#if message}
+			{message}
+			{/if}
+		{/if}
+	{/each}
+	{/if}
 </div>
 
 <style>
-	div {
-		--thumb-bg: transparent;
-		--progress-bg: #ff9355;
-		--track-bg: #deffd7;
+	.familyContainer {
+		display: grid;
+        grid-template-columns:1fr 1fr 1fr;
+        column-gap:5px;
+        row-gap:10px;
 	}
-	.selectorBox {
-		color: rgb(116, 199, 227);
-        position:relative;
-		font-size: 140px;
-        left:2.3px;
-	}
-	.container {
-		display: flex;
-		justify-content: space-around;
-	}
-	.column {
-		padding: 0px 10px;
-	}
-	p {
-		margin-top: 0px;
-	}
+   .nameButton {
+        grid-column-start:1
+    }
+
 </style>
