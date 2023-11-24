@@ -4,13 +4,26 @@
 	import { onMount } from 'svelte';
 	import type { User } from '$lib/interfaces/user';
 	import { goto } from '$app/navigation';
-	import type { moodHist } from "$lib/interfaces/moodHist";
+	import type { moodHist } from '$lib/interfaces/moodHist';
+	import { userRecord } from '$lib/stores/UserStore';
 	let userid: string;
-	let userRecord: User;
-	let name: string = '';
+	//	let userRecord: User;
+	let name: string = $userRecord.name;
+	let options: { title: string; href: string }[] = [];
+
+	onMount(async () => {
+		if ($userRecord.id == '12345') {
+			userid = localStorage.getItem('userid') || '';
+			if (userid == '') {
+				goto('/');
+			} else {
+				getUserRecord(userid);
+			}
+		}
+	});
 
 	async function getUserRecord(userid: string) {
-		console.log('Starting getUserRecord');
+		
 		const response = await fetch('/api/getUserRecord?userid=' + userid, {
 			method: 'GET',
 			body: null,
@@ -20,27 +33,43 @@
 		});
 		const value = await response.json();
 		await tick();
-		console.log('value from create is ', value);
-		userRecord = value;
-		name = userRecord.name;
+		userRecord.set(value);
+		
+	}
+	$: if ($userRecord.kid) {
+		options = [
+			{ title: 'Allowance', href: '/userpage/allowance' },
+			{ title: 'Calendar', href: '/userpage/calendar' },
+			{ title: 'Mood History', href: '/userpage/moodHistory' },
+			{ title: 'Rewards', href: '/userpage/rewards' },
+			{ title: 'Settings', href: '/userpage/settings' }
+		];
+	} else {
+		options = [
+			{ title: 'Manage Allowance', href: '/userpage/manageAllowance' },
+			{ title: 'Calendar', href: '/userpage/calendar' },
+			{ title: 'Mood History', href: '/userpage/moodHistory' },
+			{ title: 'Rewards', href: '/userpage/rewards' },
+			{ title: 'Settings', href: '/userpage/settings' }
+		];
 	}
 
 	let mounted: boolean = false;
 	let showHistory: boolean = false;
 	let moodHistory: moodHist[];
-	let moodHistLoaded:boolean=false;
+	let moodHistLoaded: boolean = false;
 	export let moodValue: number[] = [0, 100];
 
-	onMount(async () => {
-		userid = localStorage.userid;
-		if (userid) {
-			getUserRecord(userid);
-		} else {
-			goto('/');
-		}
+	//	onMount(async () => {
+	//		userid = localStorage.userid;
+	//		if (userid) {
+	//			getUserRecord(userid);
+	//		} else {
+	//			goto('/');
+	//		}
 
-		mounted = true;
-	});
+	//		mounted = true;
+	//	});
 	let oldMoodValue = 0;
 	let points: number = 0;
 	$: if (moodValue[0] != oldMoodValue && mounted) {
@@ -77,55 +106,51 @@
 
 			moodHistory.unshift(value);
 			moodHistory = [...moodHistory];
-			console.log("mood history is: ", moodHistory)
+			console.log('mood history is: ', moodHistory);
 			//		console.log(value);
 		}
 	}
 
 	async function getMoodHistory(numRecords: number) {
-		
-
 		await tick();
 		if (!moodHistLoaded) {
-			const response = await fetch('/api/getMoodHistory?numRecords=' + numRecords + '&userid='+userid, {
-				method: 'GET',
-				body: null,
-				headers: {
-					'content-type': 'application/json'
+			const response = await fetch(
+				'/api/getMoodHistory?numRecords=' + numRecords + '&userid=' + userid,
+				{
+					method: 'GET',
+					body: null,
+					headers: {
+						'content-type': 'application/json'
+					}
 				}
-			});
+			);
 
 			const value = await response.json();
 			await tick();
 			moodHistory = await value;
-			moodHistLoaded=true;
+			moodHistLoaded = true;
 			if (moodHistory.length == 0) {
-				showHistory=false
-			} else{
-				showHistory=true
+				showHistory = false;
+			} else {
+				showHistory = true;
 			}
 		} else {
 			showHistory = !showHistory;
 		}
-		        console.log("Value returned", moodHistory)
+		console.log('Value returned', moodHistory);
 		return;
 	}
 </script>
 
-<h1>Hi {name}</h1>
+<h1>Hi {$userRecord.name}</h1>
 <div class="mainContainer">
 	<div class="optionsContainer">
 		<div class="optionsItem"><h4>Points: {points}</h4></div>
 
-		<div class="optionsItem"><button><a href="/allowance">Allowance</a></button></div>
-
-		<div class="optionsItem"><button><a href="/calendar">Calendar</a></button></div>
-
-		<div class="optionsItem"><button><a href="/settings">Settings</a></button></div>
-
+		{#each options as option}
+			<div class="optionsItem"><button><a href={option.href}>{option.title}</a></button></div>
+		{/each}
 		<div class="optionsItem"><button on:click={() => getMoodHistory(20)}>Mood History</button></div>
-
-		<div class="optionsItem"><button><a href="/rewards">Rewards</a></button></div>
 	</div>
 
 	<div class="moodContainer">

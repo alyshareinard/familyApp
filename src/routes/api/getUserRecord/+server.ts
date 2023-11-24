@@ -4,7 +4,7 @@ import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const userId = String(url.searchParams.get('userid'));
-
+	console.log("getting user record for ", userId)
 	try {
 		const response = await kv.get(userId);
 		if (response) {
