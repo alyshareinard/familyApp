@@ -4,7 +4,8 @@ import { writable } from 'svelte/store';
 export const userRecord = writable({
   id: '12345',
   name: '',
-  kid: true,
+  isParent: false,
+  kids: [],
   allowanceTotal: 0,
   rewards: [{
       rewardName: '',

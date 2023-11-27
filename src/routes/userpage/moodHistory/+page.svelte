@@ -18,14 +18,13 @@
 
     userRecord.subscribe((data) => {
         myRecord = data;
+        console.log("my record ", myRecord)
+	
     });
 
 	console.log("my record ", myRecord)
 	
-	let options: { title: string; href: string }[] = [];
-	let kudos: Kudos[];
-	let events: CalEvents[];
-	let showOptions: boolean = false;
+
 	onMount(async () => {
 		console.log("userRecord", $userRecord)
 		if ($userRecord.id == '12345') {
@@ -36,6 +35,7 @@
 				getUserRecord(userid);
 			}
 		}
+        getMoodHistory(20);
 	});
 
 	async function getUserRecord(userid: string) {
@@ -52,24 +52,8 @@
 		userRecord.set(value);
 		
 	}
-	/*
-	$: if ($userRecord.kid) {
-		options = [
-			{ title: 'Allowance', href: '/userpage/allowance' },
-			{ title: 'Calendar', href: '/userpage/calendar' },
-			{ title: 'Mood History', href: '/userpage/moodHistory' },
-			{ title: 'Rewards', href: '/userpage/rewards' },
-			{ title: 'Settings', href: '/userpage/settings' }
-		];
-	} else {
-		options = [
-			{ title: 'Manage Allowance', href: '/userpage/manageAllowance' },
-			{ title: 'Calendar', href: '/userpage/calendar' },
-			{ title: 'Mood History', href: '/userpage/moodHistory' },
-			{ title: 'Rewards', href: '/userpage/rewards' },
-			{ title: 'Settings', href: '/userpage/settings' }
-		];
-	}*/
+
+
 
 	let mounted: boolean = false;
 	let showHistory: boolean = false;
@@ -77,28 +61,12 @@
 	let moodHistLoaded: boolean = false;
 	export let moodValue: number[] = [0, 100];
 
-	//	onMount(async () => {
-	//		userid = localStorage.userid;
-	//		if (userid) {
-	//			getUserRecord(userid);
-	//		} else {
-	//			goto('/');
-	//		}
 
-	//		mounted = true;
-	//	});
 	let oldMoodValue = 0;
-	let name: string = $userRecord.name;
-	let points: number = $userRecord.points;
-	let allowance: number = $userRecord.allowanceTotal;
-	$: if (moodValue[0] != oldMoodValue && mounted) {
-		//		console.log('mood value has changed');
-		//		moodHistory.unshift(newMoodRecord);
 
-		//moodHistory = [...moodHistory];
+	$: if (moodValue[0] != oldMoodValue && mounted) {
+
 		addMoodRecord(moodValue[0]);
-		//		getMoodHistory(20);
-		//		console.log("Mood history", moodHistory);
 		oldMoodValue = moodValue[0];
 	}
 
@@ -147,6 +115,7 @@
 			const value = await response.json();
 			await tick();
 			moodHistory = await value;
+            console.log("moodhistory", moodHistory)
 			moodHistLoaded = true;
 			if (moodHistory.length == 0) {
 				showHistory = false;
@@ -163,29 +132,6 @@
 
 <h1>Hi {$userRecord.name}</h1>
 <div class="mainContainer">
-	<div class="optionsContainer">
-		<div class="optionsItem"><h4>Points: {points}</h4></div>
-		{#if $userRecord.isParent==false}
-		<div class="optionsItem"><h4>Allowance: {allowance}</h4></div>
-		{/if}
-		<div class="optionsItem"><h4>Upcoming events</h4></div>
-
-		{#if events}
-		{#each events as event}
-			<div class="optionsItem"><a href={event.href}>{event.title}</a> {event.date}</div>
-		{/each}
-		{/if}
-		<div class="optionsItem"><h4>Kudos</h4></div>
-
-		{#if kudos}
-		{#each kudos as kudo}
-			<div class="optionsItem">{kudo.date} {kudo.from} {kudo.to} {kudo.reason}</div>
-		{/each}
-	
-		{/if}
-
-</div>
-
 	<div class="moodContainer">
 		<div>
 			<Slider bind:myvalue={moodValue}>
@@ -194,7 +140,7 @@
 		</div>
 
 		<div>
-			{#if showHistory}
+			
 				<h3>history</h3>
 				{#each moodHistory as history}
 					<div class="container">
@@ -202,7 +148,7 @@
 						<div class="column"><p>{history.date}</p></div>
 					</div>
 				{/each}
-			{/if}
+			
 		</div>
 	</div>
 </div>
@@ -225,13 +171,7 @@
 		display: flex;
 		justify-content: space-around;
 	}
-	.optionsContainer {
-		display: flex;
-		flex-direction: column;
-	}
-	.optionsItem {
-		margin: 5px;
-	}
+
 	.mainContainer {
 		display: flex;
 		flex-direction: row;

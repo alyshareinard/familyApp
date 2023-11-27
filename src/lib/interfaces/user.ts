@@ -1,17 +1,16 @@
 export interface User {
 	id: string;
 	name: string;
-	kid: boolean;
-
+	isParent: boolean;
+	kids?: string [];
 	allowanceTotal: number;
-
 	rewards: {
 		rewardName: string;
 		dateEarned: string;
-	}; //rewards
+	}[]; //rewards
 	options: {
 		optionName: string;
 		optionValue: string;
-	}; //options
+	}[]; //options
 	points: number;
 } //user
