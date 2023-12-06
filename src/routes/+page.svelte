@@ -49,7 +49,10 @@
 
 <p>Click your name to login</p>
 <div class="familyContainer">
-	<form use:enhance  method="POST">
+	<form method="POST" use:enhance={({formData}) => {
+        formData.append('user', user.id);
+
+    }}>
 	{#if familyMembers}
 		{#each familyMembers as member}
 			<button class="nameButton" name="user" id="user" on:click={() => assignUser(member)}>{member.name}</button>
