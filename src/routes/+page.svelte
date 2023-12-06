@@ -59,6 +59,12 @@
 			<button> login </button>
 				{#if form?.message}
 					{form.message}
+					<br>
+					locals
+					{form.locals}
+					<br>
+					request
+					{form.request}
 				{/if}
 			{/if}
 		{/each}

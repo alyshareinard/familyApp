@@ -32,7 +32,9 @@ export const actions = {
 		}*/
 
 		return {
-            message: "Success"
+            message: "Success",
+            locals,
+            request
 			//userRecord
 		};
     }
