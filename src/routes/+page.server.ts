@@ -25,6 +25,7 @@ async function checkPassword(password: string, userid: string) {
     console.log("Value is ", response)
 
 	for (let i = 0; i < response.length; i++) {
+        console.log("Single response is", response[i])
         const value=JSON.parse(response[i])
         console.log("Single value is", value)
 		if (value.id == userid) {
