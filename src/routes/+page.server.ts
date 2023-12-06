@@ -1,5 +1,6 @@
 import type { Login } from '$lib/interfaces/login';
 import { tick } from 'svelte';
+import { kv } from '@vercel/kv';
 export async function load({ fetch }) {
 	const response = await fetch('/api/getUsers', {
 		method: 'GET',
@@ -19,15 +20,8 @@ async function checkPassword(password: string, userid: string) {
     console.log("in checkpassword")
 	let message: string = '';
 	let user: Login;
-	const response = await fetch('../api/getUsers', {
-		method: 'GET',
-		body: null,
-		headers: {
-			'content-type': 'application/json'
-		}
-	});
-
-	const value = await response.json();
+    const response = await kv.lrange('users', 0, -1);
+	const value = JSON.stringify(response)
 
 	for (let i = 0; i < value.length; i++) {
 		if (value[i].id == userid) {
