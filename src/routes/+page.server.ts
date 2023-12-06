@@ -19,7 +19,7 @@ async function checkPassword(password: string, userid: string) {
     console.log("in checkpassword")
 	let message: string = '';
 	let user: Login;
-	const response = await fetch('/api/getUsers', {
+	const response = await fetch('../api/getUsers', {
 		method: 'GET',
 		body: null,
 		headers: {
