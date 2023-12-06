@@ -55,10 +55,12 @@ export const actions = {
 
         const data = await request.formData();
         const user = data.get('user');
+        const member = data.get('member');
         const password = data.get('password');
         console.log("user is ", user);
         console.log("password is ", password)
-        console.log("request is ", request)
+        console.log("member is ", member)
+
 /*
         if (password == user.password) {
 			localStorage.setItem('userid', user.id);

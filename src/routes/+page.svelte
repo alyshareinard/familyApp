@@ -52,7 +52,7 @@
 	<form use:enhance  method="POST">
 	{#if familyMembers}
 		{#each familyMembers as member}
-			<button class="nameButton" on:click={() => assignUser(member)}>{member.name}</button>
+			<button class="nameButton" id="user" on:click={() => assignUser(member)}>{member.name}</button>
 			{#if user == member}
 			<input type="text" required name="password" id="password" />
 
