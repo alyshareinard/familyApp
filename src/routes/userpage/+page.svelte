@@ -7,7 +7,6 @@
 	import { goto } from '$app/navigation';
 	import type { Kudos } from '$lib/interfaces/kudos';
 	import type { CalEvents } from '$lib/interfaces/calEvent';
-	import { userRecord } from '$lib/stores/UserStore';
 	import { getDateTime } from '$lib/utils/getDateTime';
 	export let userid: string;
 	export let data;
