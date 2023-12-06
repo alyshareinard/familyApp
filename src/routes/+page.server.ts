@@ -50,7 +50,7 @@ async function getUserRecord(userid: string) {
 
 
 export const actions = {
-	default: async ({ locals, request }) => {
+	default: async ({ request }) => {
         console.log("We're in actions")
 
         const data = await request.formData();
@@ -58,7 +58,7 @@ export const actions = {
         const password = data.get('password');
         console.log("user is ", user);
         console.log("password is ", password)
-        console.log("locals is ", locals)
+        console.log("request is ", request)
 /*
         if (password == user.password) {
 			localStorage.setItem('userid', user.id);

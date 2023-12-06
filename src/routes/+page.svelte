@@ -49,22 +49,18 @@
 
 <p>Click your name to login</p>
 <div class="familyContainer">
-	<form use:enhance method="POST">
+	<form use:enhance  method="POST">
 	{#if familyMembers}
 		{#each familyMembers as member}
 			<button class="nameButton" on:click={() => assignUser(member)}>{member.name}</button>
 			{#if user == member}
 			<input type="text" required name="password" id="password" />
 
-			<button> login </button>
+			<button type="submit"> login </button>
 				{#if form?.message}
 					{form.message}
 					<br>
-					locals
-					{form.locals}
-					<br>
-					request
-					{form.request}
+
 				{/if}
 			{/if}
 		{/each}
