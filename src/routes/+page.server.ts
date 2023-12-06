@@ -21,13 +21,14 @@ async function checkPassword(password: string, userid: string) {
 	let message: string = '';
 	let user: Login;
     const response = await kv.lrange('users', 0, -1);
-	const value = JSON.stringify(response)
+
     console.log("Value is ", value)
 
-	for (let i = 0; i < value.length; i++) {
-        console.log("Single value is", value[i])
-		if (value[i].id == userid) {
-			user = value[i];
+	for (let i = 0; i < response.length; i++) {
+        const value=JSON.parse(response[i])
+        console.log("Single value is", value)
+		if (value.id == userid) {
+			user = value;
             console.log("just found ", user)
 			break;
 		}
