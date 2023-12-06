@@ -6,40 +6,43 @@
 	import type { User } from '$lib/interfaces/user';
 	import { goto } from '$app/navigation';
 	import type { moodHist } from '$lib/interfaces/moodHist';
-	import type { Kudos } from '$lib/interfaces/kudos';
-	import type { CalEvents } from '$lib/interfaces/calevents';
 	import { userRecord } from '$lib/stores/UserStore';
 	import { getDateTime } from '$lib/utils/getDateTime';
-	let userid: string;
+	export let userid: string;
+    console.log("Userid is ", userid)
 	//	let userRecord: User;
-	console.log("userRecord", $userRecord)
-	
+	console.log('userRecord', $userRecord);
+
 	let myRecord = {} as User;
 
-    userRecord.subscribe((data) => {
-        myRecord = data;
-        console.log("my record ", myRecord)
-	
-    });
+	userRecord.subscribe((data) => {
+		myRecord = data;
+		console.log('my record ', myRecord);
+	});
+	let showHistory: boolean = false;
 
-	console.log("my record ", myRecord)
-	
+	console.log('my record ', myRecord);
 
-	onMount(async () => {
-		console.log("userRecord", $userRecord)
-		if ($userRecord.id == '12345') {
+	onMount(() => {
+		console.log('userRecord', $userRecord);
+		if ($userRecord.valid == false) {
 			userid = localStorage.getItem('userid') || '';
+			console.log("userid is ", userid)
 			if (userid == '') {
 				goto('/');
 			} else {
 				getUserRecord(userid);
 			}
 		}
-        getMoodHistory(20);
 	});
 
+	$: if(userid) {
+		console.log("getting history for ", userid)
+		getMoodHistory(20);
+		mounted = true;
+	}
+
 	async function getUserRecord(userid: string) {
-		
 		const response = await fetch('/api/getUserRecord?userid=' + userid, {
 			method: 'GET',
 			body: null,
@@ -50,35 +53,30 @@
 		const value = await response.json();
 		await tick();
 		userRecord.set(value);
-		
 	}
 
-
-
 	let mounted: boolean = false;
-	let showHistory: boolean = false;
+
 	let moodHistory: moodHist[];
 	let moodHistLoaded: boolean = false;
 	export let moodValue: number[] = [0, 100];
 
-
 	let oldMoodValue = 0;
 
 	$: if (moodValue[0] != oldMoodValue && mounted) {
-
 		addMoodRecord(moodValue[0]);
 		oldMoodValue = moodValue[0];
 	}
 
 	async function addMoodRecord(newMoodValue: number) {
 		const mood = newMoodValue;
-		const curdate = getDateTime(new Date());
+		const date = getDateTime(new Date());
 		const valid = true;
 		const notes = '';
 
 		const response = await fetch('/api/addMoodRecord', {
 			method: 'POST',
-			body: JSON.stringify({ mood, curdate, valid, notes, userid }),
+			body: JSON.stringify({ mood, date, valid, notes, userid }),
 			headers: {
 				'content-type': 'application/json'
 			}
@@ -100,6 +98,7 @@
 
 	async function getMoodHistory(numRecords: number) {
 		await tick();
+		console.log("in getmoodhistory in page for ", userid)
 		if (!moodHistLoaded) {
 			const response = await fetch(
 				'/api/getMoodHistory?numRecords=' + numRecords + '&userid=' + userid,
@@ -115,7 +114,7 @@
 			const value = await response.json();
 			await tick();
 			moodHistory = await value;
-            console.log("moodhistory", moodHistory)
+			console.log('!!!!!moodhistory', moodHistory);
 			moodHistLoaded = true;
 			if (moodHistory.length == 0) {
 				showHistory = false;
@@ -128,28 +127,34 @@
 		console.log('Value returned', moodHistory);
 		return;
 	}
+	$: console.log('MOOD VALUE: ', moodValue);
 </script>
 
-<h1>Hi {$userRecord.name}</h1>
+<h1>Mood History</h1>
 <div class="mainContainer">
 	<div class="moodContainer">
 		<div>
-			<Slider bind:myvalue={moodValue}>
-				<span class="selectorBox">&#9744;</span>
-			</Slider>
-		</div>
-
-		<div>
-			
-				<h3>history</h3>
+			{#if showHistory}
+				<h3>History</h3>
+				<div class="columnContainer">
+					<p style="font-weight: bold;">Mood</p>
+					<p style="font-weight: bold;">Date</p>
+				</div>
 				{#each moodHistory as history}
-					<div class="container">
-						<div class="column"><p>{history.moodValue}</p></div>
-						<div class="column"><p>{history.date}</p></div>
+					<div class="columnContainer">
+						<p>{history.moodValue}</p>
+						<p>
+							{history.date}
+						</p>
 					</div>
 				{/each}
-			
+			{/if}
 		</div>
+	</div>
+	<div>
+		<Slider bind:myvalue={moodValue}>
+			<span class="selectorBox">&#9744;</span>
+		</Slider>
 	</div>
 </div>
 
@@ -177,8 +182,14 @@
 		flex-direction: row;
 		justify-content: space-around;
 	}
-	.column {
+	.columnContainer {
 		padding: 0px 10px;
+		display: flex;
+
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		gap: 10px;
 	}
 	p {
 		margin-top: 0px;

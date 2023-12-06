@@ -3,43 +3,11 @@
 
 	import { tick } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
 	import { userRecord } from '$lib/stores/UserStore';
-
-	let familyMembers: Login[];
-	onMount(async () => {
-		//await createUsers()
-		//await tick()
-		getUsers();
-	});
-
-	async function createUsers() {
-		console.log('Starting createUsers');
-		const response = await fetch('/api/createUsers', {
-			method: 'POST',
-			body: null,
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
-		const value = await response.json();
-		await tick();
-		console.log('value from create is ', value);
-	}
-
-	async function getUsers() {
-		const response = await fetch('/api/getUsers', {
-			method: 'GET',
-			body: null,
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
-		const value = await response.json();
-		await tick();
-		console.log('value is ', value);
-		familyMembers = await value;
-	}
+	import { enhance } from '$app/forms';
+	export let form;
+	export let data;
+	const familyMembers: Login[] = data.familyMembers;
 
 	let user: Login;
 	let password: string = '';
@@ -48,15 +16,18 @@
 		message = '';
 		user = member;
 	}
+	/*
 	function checkPassword() {
 		if (password == user.password) {
 			localStorage.setItem('userid', user.id);
+			localStorage.setItem('userName', user.name);
 			getUserRecord(user.id);
 		} else {
 			message = 'password incorrect';
 		}
-	}
+	}*/
 
+	/*
 	async function getUserRecord(userid: string) {
 		console.log('Starting getUserRecord');
 		const response = await fetch('/api/getUserRecord?userid=' + userid, {
@@ -71,7 +42,7 @@
 		console.log('value from create is ', value);
 		userRecord.set(value);
 		goto('/userpage');
-	}
+	}*/
 </script>
 
 <h1>Welcome to the Family App</h1>
@@ -82,16 +53,20 @@
 		{#each familyMembers as member}
 			<button class="nameButton" on:click={() => assignUser(member)}>{member.name}</button>
 			{#if user == member}
-				<input bind:value={password} placeholder="password" />
 
-				<button on:click={() => checkPassword()}> login </button>
-				{#if message}
-					{message}
+				{#if form?.message}
+					{form.message}
 				{/if}
 			{/if}
 		{/each}
 	{/if}
 </div>
+
+<form use:enhance method="POST">
+	<input type="text" required name="password" id="password" />
+
+	<button> login </button>
+</form>
 
 <style>
 	.familyContainer {

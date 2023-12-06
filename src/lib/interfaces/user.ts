@@ -1,8 +1,4 @@
 export interface User {
-	id: string;
-	name: string;
-	isParent: boolean;
-	kids?: string [];
 	allowanceTotal: number;
 	rewards: {
 		rewardName: string;
@@ -13,4 +9,11 @@ export interface User {
 		optionValue: string;
 	}[]; //options
 	points: number;
+	isParent: boolean;
+	weeklyAllowance:number;
+	children: {
+        id: string;
+		name: string; 
+	}[];
+	valid:boolean;
 } //user

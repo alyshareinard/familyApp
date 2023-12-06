@@ -6,6 +6,7 @@ import type { RequestHandler } from './$types';
 export const POST: RequestHandler = async ({ request }) => {
 
 	const {mood, date, valid, notes, userid} = await request.json()
+	console.log("in addmoodrecodd date is ", date, mood)
 	const newMoodRecord = {
 		moodValue: Number(mood),
 		date: date,

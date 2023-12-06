@@ -4,5 +4,6 @@ export interface Kudos {
     toid: string;
     isPublic: boolean;
 	reason: string;
+    valid: boolean;
 }
 [];

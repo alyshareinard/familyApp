@@ -1,4 +1,6 @@
 export function getDateTime(date: Date = new Date()) {
+	console.log("in getDateTime")
+	console.log("date: ", date)
 	const dayOfMonth = date.getDate();
 	const month = date.getMonth(); // Be careful! January is 0, not 1
 	const year = date.getFullYear();
@@ -11,5 +13,7 @@ export function getDateTime(date: Date = new Date()) {
 	hours = hours ? hours : 12; // the hour '0' should be '12'
 	let strminutes = minutes < 10 ? '0' + minutes : minutes;
 	let strTime = hours + ':' + strminutes + ' ' + ampm;
+
+	console.log("returning: ", dateString + ' ' + strTime)
 	return dateString + ' ' + strTime;
 }

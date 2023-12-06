@@ -1,4 +1,4 @@
-export interface CalEvents {
+export interface CalEvent {
 	date: string;
     timeFrom?: string;
     timeTo?: string;
@@ -7,5 +7,5 @@ export interface CalEvents {
     isPublic: boolean;
     location?: string;
     forIds: string[];
-}
-[];
+    valid: boolean;
+};

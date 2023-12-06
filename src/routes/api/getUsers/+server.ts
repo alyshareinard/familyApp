@@ -5,7 +5,7 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async () => {
 
 	try {
-		const response = await kv.get('users');
+		const response = await kv.lrange('users', 0, -1);
 		if (response) {
 			let users = response;
 

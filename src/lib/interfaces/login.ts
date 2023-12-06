@@ -3,5 +3,6 @@ export interface Login {
     name:string
     password:string
     loginRewards:string[]
-    kid:boolean
+    valid:boolean
+
 }

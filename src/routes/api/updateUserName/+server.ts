@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const { userid, newName } = await request.json();
 
 	try {
-		const users = await kv.get('users');
+		const users:Login[] = await kv.lrange('users', 0, -1);
 		
 		if ( users ) {
 			//let users: Login[] = response;
@@ -29,18 +29,19 @@ export const POST: RequestHandler = async ({ request }) => {
                 return new Response(JSON.stringify({message:"user not found"}), { status: 400 });
             }
             console.log("userid", userid)
-            const userRecord: User = await kv.get(userid);
-            console.log("user record: ", userRecord)
+            const tempRecord: any = await kv.get(userid);
+            console.log("user record: ", tempRecord)
             //check to see if userRecord contains the key 'name'
-            if (!userRecord) {
+            if (!tempRecord) {
                 return new Response(JSON.stringify({message:"user not found"}), { status: 400 });
-            } else if (!('name' in userRecord)) {
+            } else if (!('name' in tempRecord)) {
                 return new Response(JSON.stringify({message:"corrupt user -- does not contain 'name'"}), { status: 400 });
             }
-            userRecord.name=newName;
-            const response = await kv.set(userid, userRecord);
+            console.log("userindex is ", userindex)
+            tempRecord.name=newName;
+            const response = await kv.set(userid, tempRecord);
             console.log("response: ", response)
-			const response2 = await kv.set('users', JSON.stringify(users));
+			const response2 = await kv.lset('users', userindex, JSON.stringify(users[userindex]));
             await tick()
             console.log("Name changed: ", response2)
 			return new Response(JSON.stringify({message:"Name changed"}), { status: 200 });
@@ -48,6 +49,6 @@ export const POST: RequestHandler = async ({ request }) => {
 	} catch(error) {
         console.log("houston we have a problem (in UpdateUserPassword)")
         console.log(error)
-		return new Response(JSON.stringify({}), { status: 400 });
+		return new Response(JSON.stringify({message:"unknown issue"}), { status: 400 });
 	}
 };

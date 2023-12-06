@@ -5,12 +5,11 @@
 	import { onMount } from 'svelte';
 	import type { User } from '$lib/interfaces/user';
 	import { goto } from '$app/navigation';
-	import type { moodHist } from '$lib/interfaces/moodHist';
 	import type { Kudos } from '$lib/interfaces/kudos';
 	import type { CalEvents } from '$lib/interfaces/calevents';
 	import { userRecord } from '$lib/stores/UserStore';
 	import { getDateTime } from '$lib/utils/getDateTime';
-	let userid: string;
+	export let userid: string;
 	//	let userRecord: User;
 	console.log("userRecord", $userRecord)
 	
@@ -19,23 +18,24 @@
     userRecord.subscribe((data) => {
         myRecord = data;
     });
-
+	let mounted: boolean = false;
 	console.log("my record ", myRecord)
 	
-	let options: { title: string; href: string }[] = [];
 	let kudos: Kudos[];
 	let events: CalEvents[];
-	let showOptions: boolean = false;
-	onMount(async () => {
+	let userName:string=''
+	onMount(() => {
 		console.log("userRecord", $userRecord)
-		if ($userRecord.id == '12345') {
+		if ($userRecord.valid == false) {
 			userid = localStorage.getItem('userid') || '';
+			userName = localStorage.getItem('userName') || '';
 			if (userid == '') {
 				goto('/');
 			} else {
 				getUserRecord(userid);
 			}
 		}
+		mounted=true
 	});
 
 	async function getUserRecord(userid: string) {
@@ -50,118 +50,47 @@
 		const value = await response.json();
 		await tick();
 		userRecord.set(value);
+		console.log("User record is now ", userRecord)
 		
 	}
-	/*
-	$: if ($userRecord.kid) {
-		options = [
-			{ title: 'Allowance', href: '/userpage/allowance' },
-			{ title: 'Calendar', href: '/userpage/calendar' },
-			{ title: 'Mood History', href: '/userpage/moodHistory' },
-			{ title: 'Rewards', href: '/userpage/rewards' },
-			{ title: 'Settings', href: '/userpage/settings' }
-		];
-	} else {
-		options = [
-			{ title: 'Manage Allowance', href: '/userpage/manageAllowance' },
-			{ title: 'Calendar', href: '/userpage/calendar' },
-			{ title: 'Mood History', href: '/userpage/moodHistory' },
-			{ title: 'Rewards', href: '/userpage/rewards' },
-			{ title: 'Settings', href: '/userpage/settings' }
-		];
-	}*/
 
-	let mounted: boolean = false;
-	let showHistory: boolean = false;
-	let moodHistory: moodHist[];
-	let moodHistLoaded: boolean = false;
-	export let moodValue: number[] = [0, 100];
 
-	//	onMount(async () => {
-	//		userid = localStorage.userid;
-	//		if (userid) {
-	//			getUserRecord(userid);
-	//		} else {
-	//			goto('/');
-	//		}
 
-	//		mounted = true;
-	//	});
+
+//	let moodValue: number = 0;
+	let possValues: number[] = [0, 100];
+	$: moodValue = possValues[0];
 	let oldMoodValue = 0;
-	let name: string = $userRecord.name;
 	let points: number = $userRecord.points;
 	let allowance: number = $userRecord.allowanceTotal;
-	$: if (moodValue[0] != oldMoodValue && mounted) {
-		//		console.log('mood value has changed');
-		//		moodHistory.unshift(newMoodRecord);
-
-		//moodHistory = [...moodHistory];
-		addMoodRecord(moodValue[0]);
-		//		getMoodHistory(20);
-		//		console.log("Mood history", moodHistory);
-		oldMoodValue = moodValue[0];
+	$: if (moodValue != oldMoodValue && mounted) {
+		addMoodRecord(moodValue);
+		oldMoodValue = moodValue;
 	}
 
 	async function addMoodRecord(newMoodValue: number) {
 		const mood = newMoodValue;
-		const curdate = getDateTime(new Date());
+		console.log("newMoodValue", newMoodValue)
+		const date = getDateTime(new Date());
 		const valid = true;
 		const notes = '';
 
 		const response = await fetch('/api/addMoodRecord', {
 			method: 'POST',
-			body: JSON.stringify({ mood, curdate, valid, notes, userid }),
+			body: JSON.stringify({ mood, date, valid, notes, userid }),
 			headers: {
 				'content-type': 'application/json'
 			}
 		});
 
 		const value = await response.json();
-		if (moodHistLoaded) {
-			await tick();
-			if (moodHistory.length > 20) {
-				moodHistory.pop();
-			}
 
-			moodHistory.unshift(value);
-			moodHistory = [...moodHistory];
-			console.log('mood history is: ', moodHistory);
-			//		console.log(value);
-		}
 	}
 
-	async function getMoodHistory(numRecords: number) {
-		await tick();
-		if (!moodHistLoaded) {
-			const response = await fetch(
-				'/api/getMoodHistory?numRecords=' + numRecords + '&userid=' + userid,
-				{
-					method: 'GET',
-					body: null,
-					headers: {
-						'content-type': 'application/json'
-					}
-				}
-			);
-
-			const value = await response.json();
-			await tick();
-			moodHistory = await value;
-			moodHistLoaded = true;
-			if (moodHistory.length == 0) {
-				showHistory = false;
-			} else {
-				showHistory = true;
-			}
-		} else {
-			showHistory = !showHistory;
-		}
-		console.log('Value returned', moodHistory);
-		return;
-	}
+	const href='/userpage/calendar'
 </script>
 
-<h1>Hi {$userRecord.name}</h1>
+<h1>Hi {userName}</h1>
 <div class="mainContainer">
 	<div class="optionsContainer">
 		<div class="optionsItem"><h4>Points: {points}</h4></div>
@@ -172,14 +101,14 @@
 
 		{#if events}
 		{#each events as event}
-			<div class="optionsItem"><a href={event.href}>{event.title}</a> {event.date}</div>
+			<div class="optionsItem"><a href={href}>{event.title}</a> {event.date}</div>
 		{/each}
 		{/if}
 		<div class="optionsItem"><h4>Kudos</h4></div>
 
 		{#if kudos}
 		{#each kudos as kudo}
-			<div class="optionsItem">{kudo.date} {kudo.from} {kudo.to} {kudo.reason}</div>
+			<div class="optionsItem">{kudo.date} {kudo.fromid} {kudo.toid} {kudo.reason}</div>
 		{/each}
 	
 		{/if}
@@ -188,22 +117,12 @@
 
 	<div class="moodContainer">
 		<div>
-			<Slider bind:myvalue={moodValue}>
+			<Slider bind:myvalue={possValues}>
 				<span class="selectorBox">&#9744;</span>
 			</Slider>
 		</div>
 
-		<div>
-			{#if showHistory}
-				<h3>history</h3>
-				{#each moodHistory as history}
-					<div class="container">
-						<div class="column"><p>{history.moodValue}</p></div>
-						<div class="column"><p>{history.date}</p></div>
-					</div>
-				{/each}
-			{/if}
-		</div>
+
 	</div>
 </div>
 
