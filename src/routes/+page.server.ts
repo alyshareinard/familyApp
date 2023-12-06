@@ -23,8 +23,9 @@ async function checkPassword(password: string, userid: string) {
     const response = await kv.lrange('users', 0, -1);
 	const value = JSON.stringify(response)
     console.log("Value is ", value)
-    
+
 	for (let i = 0; i < value.length; i++) {
+        console.log("Single value is", value[i])
 		if (value[i].id == userid) {
 			user = value[i];
             console.log("just found ", user)
