@@ -12,13 +12,10 @@
 	export let userid: string;
 	export let data;
 	const userRecord: User = data.userRecord;
-	console.log("userRecord", $userRecord)
+	console.log("userRecord", userRecord)
 	
 	let myRecord = {} as User;
 
-    userRecord.subscribe((data) => {
-        myRecord = data;
-    });
 	let mounted: boolean = false;
 	console.log("my record ", myRecord)
 	
@@ -26,8 +23,8 @@
 	let events: CalEvents[];
 	let userName:string=''
 	onMount(() => {
-		console.log("userRecord", $userRecord)
-		if ($userRecord.valid == false) {
+		console.log("userRecord", userRecord)
+		if (userRecord.valid == false) {
 			userid = localStorage.getItem('userid') || '';
 			userName = localStorage.getItem('userName') || '';
 			if (userid == '') {
@@ -50,7 +47,7 @@
 		});
 		const value = await response.json();
 		await tick();
-		userRecord.set(value);
+
 		console.log("User record is now ", userRecord)
 		
 	}
@@ -62,8 +59,8 @@
 	let possValues: number[] = [0, 100];
 	$: moodValue = possValues[0];
 	let oldMoodValue = 0;
-	let points: number = $userRecord.points;
-	let allowance: number = $userRecord.allowanceTotal;
+	let points: number =userRecord.points;
+	let allowance: number = userRecord.allowanceTotal;
 	$: if (moodValue != oldMoodValue && mounted) {
 		addMoodRecord(moodValue);
 		oldMoodValue = moodValue;
@@ -95,7 +92,7 @@
 <div class="mainContainer">
 	<div class="optionsContainer">
 		<div class="optionsItem"><h4>Points: {points}</h4></div>
-		{#if $userRecord.isParent==false}
+		{#if userRecord.isParent==false}
 		<div class="optionsItem"><h4>Allowance: {allowance}</h4></div>
 		{/if}
 		<div class="optionsItem"><h4>Upcoming events</h4></div>
