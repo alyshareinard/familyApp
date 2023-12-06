@@ -22,7 +22,7 @@ async function checkPassword(password: string, userid: string) {
 	let user: Login;
     const response = await kv.lrange('users', 0, -1);
 
-    console.log("Value is ", value)
+    console.log("Value is ", response)
 
 	for (let i = 0; i < response.length; i++) {
         const value=JSON.parse(response[i])
