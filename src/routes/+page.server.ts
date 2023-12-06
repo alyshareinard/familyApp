@@ -37,7 +37,8 @@ async function checkPassword(password: string, userid: string) {
 	await tick;
 
 	if (user && password == user.password) {
-		const userRecord = getUserRecord(user.id);
+        const userRecord = await kv.get(user.id);
+        console.log("user record is ", userRecord)
 		message = 'Success';
 		return {
 			message: message,
@@ -50,19 +51,6 @@ async function checkPassword(password: string, userid: string) {
 	}
 }
 
-async function getUserRecord(userid: string) {
-	console.log('Starting getUserRecord');
-	const response = await fetch('/api/getUserRecord?userid=' + userid, {
-		method: 'GET',
-		body: null,
-		headers: {
-			'content-type': 'application/json'
-		}
-	});
-	const value = await response.json();
-	console.log('value from create is ', value);
-	return value;
-}
 
 export const actions = {
 	default: async ({ request }) => {
