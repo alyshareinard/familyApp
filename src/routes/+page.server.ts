@@ -14,13 +14,50 @@ export async function load({ fetch}){
     }
 }
 
+function checkPassword(password:string, user:Login) {
+    let message:string=''
+    if (password == user.password) {
+
+        const userRecord=getUserRecord(user.id);
+        message="Success";
+        return({
+            message:message,
+            userRecord
+        })
+    } else {
+        return({
+            message:'Password incorrect'
+        })
+       
+    }
+}
+
+
+async function getUserRecord(userid: string) {
+    console.log('Starting getUserRecord');
+    const response = await fetch('/api/getUserRecord?userid=' + userid, {
+        method: 'GET',
+        body: null,
+        headers: {
+            'content-type': 'application/json'
+        }
+    });
+    const value = await response.json();
+    console.log('value from create is ', value);
+    return(value)
+
+}
+
+
 export const actions = {
 	default: async ({ locals, request }) => {
         console.log("We're in actions")
 
         const data = await request.formData();
+        const user = data.get('user');
         const password = data.get('password');
-        console.log("userid is ", password)
+        console.log("user is ", user);
+        console.log("password is ", password)
         console.log("locals is ", locals)
 /*
         if (password == user.password) {
@@ -33,8 +70,7 @@ export const actions = {
 
 		return {
             message: "Success",
-            locals,
-            request
+  
 			//userRecord
 		};
     }
