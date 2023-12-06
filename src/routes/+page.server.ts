@@ -1,6 +1,8 @@
 import type { Login } from '$lib/interfaces/login';
 import { tick } from 'svelte';
 import { kv } from '@vercel/kv';
+import { redirect } from '@sveltejs/kit';
+
 export async function load({ fetch }) {
 	const response = await fetch('/api/getUsers', {
 		method: 'GET',
@@ -25,9 +27,9 @@ async function checkPassword(password: string, userid: string) {
     console.log("Value is ", response)
 
 	for (let i = 0; i < response.length; i++) {
-        console.log("Single response is", response[i])
+
         const value=response[i]
-        console.log("Single value is", value)
+
 		if (value.id == userid) {
 			user = value;
             console.log("just found ", user)
@@ -54,12 +56,12 @@ async function checkPassword(password: string, userid: string) {
 
 export const actions = {
 	default: async ({ request }) => {
-		console.log("We're in actions");
+
 
 		const data = await request.formData();
 		const userid = data.get('user');
 		const password = data.get('password');
-		console.log('user is ', userid);
+
 
 		if (!userid || !password) {
 			return {
@@ -68,6 +70,10 @@ export const actions = {
 		} else {
 			const response = await checkPassword(password, userid);
 
+            if (response.userRecord){
+                const userRecord = response.userRecord;
+                redirect(303, '/userpage');
+            }
 			return {
 				message: response.message,
 				userRecord: response.userRecord

@@ -6,11 +6,12 @@
 	import type { User } from '$lib/interfaces/user';
 	import { goto } from '$app/navigation';
 	import type { Kudos } from '$lib/interfaces/kudos';
-	import type { CalEvents } from '$lib/interfaces/calevents';
+	import type { CalEvents } from '$lib/interfaces/calEvent';
 	import { userRecord } from '$lib/stores/UserStore';
 	import { getDateTime } from '$lib/utils/getDateTime';
 	export let userid: string;
-	//	let userRecord: User;
+	export let data;
+	const userRecord: User = data.userRecord;
 	console.log("userRecord", $userRecord)
 	
 	let myRecord = {} as User;
