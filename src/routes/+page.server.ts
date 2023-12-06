@@ -17,21 +17,20 @@ export async function load({ fetch}){
 export const actions = {
 	default: async ({ locals, request }) => {
         console.log("We're in actions")
-        /*
+
         const data = await request.formData();
         const password = data.get('password');
         console.log("userid is ", password)
         console.log("locals is ", locals)
-        */
-        /*
+/*
         if (password == user.password) {
 			localStorage.setItem('userid', user.id);
 			localStorage.setItem('userName', user.name);
 			getUserRecord(user.id);
 		} else {
 			message = 'password incorrect';
-		}
-*/
+		}*/
+
 		return {
             message: "Success"
 			//userRecord
