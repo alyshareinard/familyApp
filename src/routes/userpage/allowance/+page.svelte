@@ -1,49 +1,49 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { userRecord } from '$lib/stores/UserStore';
+	//	import { userRecord } from '$lib/stores/UserStore';
 	import type { User } from '$lib/interfaces/user';
-    import type { Login } from '$lib/interfaces/login';
-    import type { AllowanceRecord } from '$lib/interfaces/allowanceRecord';
-	import { page } from '$app/stores'
-    import { tick } from 'svelte';
-	let userid: string;
-	let children: {id:string, name:string}[];
-	console.log('userRecord', $userRecord);
-	let myRecord = {} as User;
-	console.log("HERE IS THE PAGE DATA", $page)
-	userRecord.subscribe((data) => {
-		myRecord = data;
-	});
-    let transactions: AllowanceRecord[]
-	let kidAllowances:{id:string, name:string, transactions:AllowanceRecord[]}[]
+	import type { AllowanceRecord } from '$lib/interfaces/allowanceRecord';
+	import { tick } from 'svelte';
+	import { getDateTime } from '$lib/utils/getDateTime';
+	import { enhance } from '$app/forms';
 
-	console.log('my record ', myRecord);
+	let userid: string;
+	let children: { id: string; name: string }[];
+	//	console.log('userRecord', $userRecord);
+	let openTransactionForm=false
+	let userRecord: User;
+	let transactions: AllowanceRecord[];
+	let kidAllowances: { id: string; name: string; transactions: AllowanceRecord[] }[] = [];
+	let approved:boolean
+	//	console.log('my record ', myRecord);
 
 	onMount(async () => {
-		userid = localStorage.getItem('userid') || '';
-
-        console.log("is parent = ", $userRecord.isParent)
-
-		if ($userRecord.valid == false) {
-			userid = localStorage.getItem('userid') || '';
-			console.log("userid is ", userid)
-			if (userid == '') {
-				goto('/');
+		let tryuserid = localStorage.getItem('userid');
+		if (!tryuserid) {
+			tryuserid = '475625';
+			localStorage.setItem('userid', tryuserid);
+		}
+		if (tryuserid) {
+			userid = tryuserid;
+			const tryuserRecord = localStorage.getItem('userRecord');
+			if (tryuserRecord) {
+				userRecord = JSON.parse(tryuserRecord);
 			} else {
 				getUserRecord(userid);
 			}
+		} else {
+			goto('/');
 		}
-
-		if ($userRecord.isParent && $userRecord.children.length > 0) {
-			for (let i = 0; i < children.length; i++) {
-				getAllowance(children[i].id, children[i].name);
+		console.log('UserRecord is ', userRecord.children.length);
+		if (userRecord.isParent && userRecord.children && userRecord.children.length > 0) {
+			for (let i = 0; i < userRecord.children.length; i++) {
+				getAllowance(userRecord.children[i].id, userRecord.children[i].name);
 			}
 		} else {
-            getAllowance(userid, '');
-        }
+			getAllowance(userid, '');
+		}
 	});
-
 
 	async function getUserRecord(userid: string) {
 		const response = await fetch('/api/getUserRecord?userid=' + userid, {
@@ -55,11 +55,12 @@
 		});
 		const value = await response.json();
 		await tick();
-		userRecord.set(value);
+		userRecord = value;
+		localStorage.setItem('userRecord', JSON.stringify(userRecord));
 	}
 
-    async function getAllowance(userid:string, name:string){
-
+	async function getAllowance(userid: string, name: string) {
+		console.log('Get Allowance');
 		const response = await fetch('/api/getAllowance?userid=' + userid, {
 			method: 'GET',
 			body: null,
@@ -67,41 +68,105 @@
 				'content-type': 'application/json'
 			}
 		});
-		const value = await response.json();
+		let value = await response.json();
 		await tick();
-        if ($userRecord.isParent) {
-            kidAllowances.push({id:userid, name:name, transactions:value})
-        } else {
-            transactions = value
-        }
-		
-		
+		console.log(value);
+		if (value == null || value.length == 0) {
+			value = [
+				{
+					amount: 0,
+					date: getDateTime(new Date()),
+					valid: true,
+					reason: ''
+				}
+			];
+		}
+		if (userRecord && userRecord.isParent) {
+			approved=true
+			kidAllowances.push({ id: userid, name: name, transactions: value });
+		} else {
+			approved=false
+			transactions = value;
+		}
+		kidAllowances = kidAllowances;
+		console.log('kidAllowances', kidAllowances);
 	}
-    
+	async function addAllowanceRecord() {
+		console.log('Add Allowance Transaction');
+		const response = await fetch('/api/addAllowanceRecord', {
+			method: 'POST',
+			body: JSON.stringify({
+				userid,
+				amount: 0,
+				date: getDateTime(new Date()),
+				valid: true,
+				reason: '',
+				approved:approved,
+			})
+		})
+	}
 </script>
 
 <h1>Allowance</h1>
+{#if userRecord}
+	{#if userRecord.isParent}
+		Parent page
 
-{#if $userRecord.isParent}
-Parent page
-	<div class="summaryContainer">
 		<h3>Current Total</h3>
-	</div>
-    {#each kidAllowances as record}
-    {record.name}
-    {#each record.transactions as transaction}
-    {transaction.amount}
-    {/each}
-    {/each}
-{:else}
-	<h3>Current Total</h3>
 
-	<h3>Transactions</h3>
-    {transactions}
+		{#each kidAllowances as record}
+			<div class="summaryContainer">
+				{record.name}
+				{#if record.transactions}
+					<div class="transactionContainer">
+						<p>Date</p>
+						<p>Amount</p>
+						<p>Reason</p>
+						<p>Actions</p>
+						{#each record.transactions as transaction}
+							<p>{transaction.date}</p>
+							<p>{transaction.amount}</p>
+							<p>{transaction.reason}</p>
+							<button>Cancel</button>
+						{/each}
+					</div>
+				{/if}
+				<button on:click={() => (openTransactionForm = true)}>New transaction</button>
+				{#if openTransactionForm}
+					<form>
+						<label for="amount">Amount</label>
+						<input type="number" name="amount" id="amount" />
+
+						<label for="reason">Reason</label>
+						<input type="text" name="reason" id="reason" />
+
+						<label for="date">Date</label>
+						<input type="string" name="date" id="date" value={getDateTime(new Date())}/>
+
+						<button on:click={addAllowanceRecord} type="submit" >Submit</button>
+					</form>
+				{/if}
+				
+			</div>
+		{/each}
+	{:else}
+		<h3>Current Total</h3>
+
+		<h3>Transactions</h3>
+		{transactions}
+	{/if}
 {/if}
 
 <style>
 	.summaryContainer {
+		margin-bottom: 40px;
 		width: 50%;
+		display: flex;
+		flex-direction: column;
+	}
+	.transactionContainer {
+		display: grid;
+		grid-template-columns: 2fr 1fr 2fr 1fr;
+		grid-gap: 20px;
 	}
 </style>

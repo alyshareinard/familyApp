@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+/*	import { onMount } from 'svelte';
 	import { userRecord } from '$lib/stores/UserStore';
 	import { goto } from '$app/navigation';
     import {tick} from 'svelte';
@@ -29,7 +29,7 @@
 		const value = await response.json();
 		await tick();
 		userRecord.set(value);
-	}
+	}*/
 </script>
 
 <nav>
