@@ -13,6 +13,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		valid: true,
 		approved: false
 	};
+	console.log("adding allowance record", newAllowanceRecord)
 	kv.lpush('allowance:'+userid, newAllowanceRecord);
 	return new Response (JSON.stringify(newAllowanceRecord), { status: 200 });
 
