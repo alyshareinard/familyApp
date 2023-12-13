@@ -95,12 +95,12 @@
 		kidAllowances = kidAllowances;
 		console.log('kidAllowances', kidAllowances);
 	}
-	async function addAllowanceRecord() {
+	async function addAllowanceRecord(kiduserid:string) {
 		console.log('Add Allowance Transaction');
 		const response = await fetch('/api/addAllowanceRecord', {
 			method: 'POST',
 			body: JSON.stringify({
-				userid,
+				userid:kiduserid,
 				amount: newAmount,
 				date: getDateTime(new Date()),
 				valid: true,
@@ -149,7 +149,7 @@
 						<label for="date">Date</label>
 						<input type="string" name="date" id="date" value={getDateTime(new Date())}/>
 
-						<button on:click={addAllowanceRecord} type="submit" >Submit</button>
+						<button on:click={()=>addAllowanceRecord(record.id)} type="submit" >Submit</button>
 					</form>
 				{/if}
 				
