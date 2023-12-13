@@ -16,6 +16,10 @@
 	let transactions: AllowanceRecord[];
 	let kidAllowances: { id: string; name: string; transactions: AllowanceRecord[] }[] = [];
 	let approved:boolean
+
+	let newAmount: number;
+	let newReason: string;
+	
 	//	console.log('my record ', myRecord);
 
 	onMount(async () => {
@@ -97,13 +101,15 @@
 			method: 'POST',
 			body: JSON.stringify({
 				userid,
-				amount: 0,
+				amount: newAmount,
 				date: getDateTime(new Date()),
 				valid: true,
-				reason: '',
+				reason: newReason,
 				approved:approved,
 			})
 		})
+		newAmount=0;
+		newReason="";
 	}
 </script>
 
@@ -134,11 +140,11 @@
 				<button on:click={() => (openTransactionForm = true)}>New transaction</button>
 				{#if openTransactionForm}
 					<form>
-						<label for="amount">Amount</label>
-						<input type="number" name="amount" id="amount" />
+						<label for="amount" >Amount</label>
+						<input type="number" name="amount" id="amount" bind:value={newAmount} />
 
 						<label for="reason">Reason</label>
-						<input type="text" name="reason" id="reason" />
+						<input type="text" name="reason" id="reason" bind:value={newReason} />
 
 						<label for="date">Date</label>
 						<input type="string" name="date" id="date" value={getDateTime(new Date())}/>
