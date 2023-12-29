@@ -28,7 +28,7 @@ async function checkPassword(password: string, userid: string) {
 
 	for (let i = 0; i < response.length; i++) {
 
-        const value=response[i]
+        const value:Login=response[i]
 
 		if (value.id == userid) {
 			user = value;
@@ -56,11 +56,11 @@ async function checkPassword(password: string, userid: string) {
 
 export const actions = {
 	default: async ({ request }) => {
-
-
+        console.log("in actions")
 		const data = await request.formData();
 		const userid = data.get('user');
 		const password = data.get('password');
+        console.log("password is ", password)
 
 
 		if (!userid || !password) {
@@ -72,7 +72,7 @@ export const actions = {
 
             if (response.userRecord){
                 const userRecord = response.userRecord;
-                redirect(303, '/userpage');
+                throw redirect(303, '/userpage');
             }
 			return {
 				message: response.message,

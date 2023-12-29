@@ -16,7 +16,23 @@ export const GET: RequestHandler = async ({ url }) => {
 			throw error;
 		}
 	} catch {
-		const userRecord: {} = {};
+		const userRecord = {
+			allowanceTotal: 0,
+			rewards: [{
+				rewardName: "darkMode",
+				dateEarned: "2022-03-04",
+			}], //rewards
+			options: [{
+				optionName: "darkMode",
+				optionValue: true,
+			}], //options
+			points: 206,
+			isParent: false,
+			weeklyAllowance:10,
+			children: [],
+			valid:true,
+		} //user
+		
 		return new Response(JSON.stringify(userRecord), { status: 400 });
 	}
 };

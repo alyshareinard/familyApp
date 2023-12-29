@@ -12,8 +12,22 @@ export const GET: RequestHandler = async ({ url }) => {
 		const allowanceHist = await kv.lrange(allowanceid, 0, numRecords);
 		return new Response(JSON.stringify(allowanceHist), { status: 200 });
 	} catch {
-
-		return new Response(JSON.stringify([]), {status:400})
+		const allowanceHist = [{
+			amount: 102,
+			date: "2020-01-05",
+			reason: "starting amount",
+			valid: true,
+			approved:true
+		},
+		{
+			amount: 12,
+			date: "2020-01-12",
+			reason: "allowance",
+			valid: true,
+			approved:true
+		}
+	]
+		return new Response(JSON.stringify(allowanceHist), {status:400})
 	}
 
 }

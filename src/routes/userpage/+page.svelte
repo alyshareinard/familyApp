@@ -6,33 +6,23 @@
 	import type { User } from '$lib/interfaces/user';
 	import { goto } from '$app/navigation';
 	import type { Kudos } from '$lib/interfaces/kudos';
-	import type { CalEvents } from '$lib/interfaces/calEvent';
+	import type { CalEvent } from '$lib/interfaces/calEvent';
 	import { getDateTime } from '$lib/utils/getDateTime';
 	export let userid: string;
-	export let data;
-	const userRecord: User = data.userRecord;
-	console.log("userRecord", userRecord)
-	
-	let myRecord = {} as User;
+	let userRecord: User;
 
 	let mounted: boolean = false;
-	console.log("my record ", myRecord)
 	
 	let kudos: Kudos[];
-	let events: CalEvents[];
+	let events: CalEvent[];
 	let userName:string=''
+	let points: number
+	let allowance: number
 	onMount(() => {
-		console.log("userRecord", userRecord)
-		if (userRecord.valid == false) {
-			userid = localStorage.getItem('userid') || '';
-			userName = localStorage.getItem('userName') || '';
-			if (userid == '') {
-				goto('/');
-			} else {
-				getUserRecord(userid);
-			}
-		}
-		mounted=true
+		userid= localStorage.getItem('userid') || '';
+		userName = localStorage.getItem('userName') || '';
+		getUserRecord(userid)
+
 	});
 
 	async function getUserRecord(userid: string) {
@@ -47,7 +37,11 @@
 		const value = await response.json();
 		await tick();
 
-		console.log("User record is now ", userRecord)
+		userRecord = value
+		console.log("userRecord", userRecord)
+		points= userRecord.points;
+		allowance = userRecord.allowanceTotal;
+		mounted=true
 		
 	}
 
@@ -58,8 +52,7 @@
 	let possValues: number[] = [0, 100];
 	$: moodValue = possValues[0];
 	let oldMoodValue = 0;
-	let points: number =userRecord.points;
-	let allowance: number = userRecord.allowanceTotal;
+
 	$: if (moodValue != oldMoodValue && mounted) {
 		addMoodRecord(moodValue);
 		oldMoodValue = moodValue;
@@ -87,6 +80,7 @@
 	const href='/userpage/calendar'
 </script>
 
+{#if userRecord}
 <h1>Hi {userName}</h1>
 <div class="mainContainer">
 	<div class="optionsContainer">
@@ -112,6 +106,7 @@
 
 </div>
 
+
 	<div class="moodContainer">
 		<div>
 			<Slider bind:myvalue={possValues}>
@@ -122,7 +117,7 @@
 
 	</div>
 </div>
-
+{/if}
 <style>
 	div {
 		--thumb-bg: transparent;

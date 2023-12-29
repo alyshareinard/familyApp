@@ -16,6 +16,8 @@
 		message = '';
 		user = member;
 	}
+
+	//for $: you can wrap in parenthesis to avoid a warning
 	/*
 	function checkPassword() {
 		if (password == user.password) {
@@ -54,8 +56,9 @@
 
     }}>
 	{#if familyMembers}
+		<div class="memberContainer">
 		{#each familyMembers as member}
-			<button class="nameButton" name="user" id="user" on:click={() => assignUser(member)}>{member.name}</button>
+			<button class="nameButton" name="user" id="user" value=member.id on:click={() => assignUser(member)}>{member.name}</button>
 			{#if user == member}
 			<input type="text" required name="password" id="password" />
 
@@ -67,6 +70,7 @@
 				{/if}
 			{/if}
 		{/each}
+	</div>
 	{/if}
 </form>
 </div>
@@ -77,6 +81,10 @@
 
 <style>
 	.familyContainer {
+		display: flex;
+		flex-direction:column;
+	}
+	.memberContainer {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 		column-gap: 5px;

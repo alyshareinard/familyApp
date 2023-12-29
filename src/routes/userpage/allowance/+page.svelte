@@ -95,7 +95,7 @@
 		kidAllowances = kidAllowances;
 		console.log('kidAllowances', kidAllowances);
 	}
-	async function addAllowanceRecord(kiduserid:string) {
+	async function addAllowanceRecord(kiduserid:string, kidTotalAllowance:number) {
 		console.log('Add Allowance Transaction');
 		const response = await fetch('/api/addAllowanceRecord', {
 			method: 'POST',
