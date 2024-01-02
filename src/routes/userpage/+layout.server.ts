@@ -3,9 +3,9 @@
 import { kv } from '@vercel/kv';
 import { redirect } from '@sveltejs/kit';
 
-export async function load({ fetch, params, parent }) {
+export async function load({ fetch, parent }) {
     const parent_data = await parent();
-    console.log("params in userpage", params)
+//    console.log("params in userpage", params)
     console.log("parent in userpage", parent_data)
 
     const userid='475625'

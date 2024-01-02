@@ -9,7 +9,9 @@
 	import type { CalEvent } from '$lib/interfaces/calEvent';
 	import { getDateTime } from '$lib/utils/getDateTime';
 	export let userid: string;
-	let userRecord: User;
+	
+	export let data;
+	$: ( {userRecord} = data);
 
 	let mounted: boolean = false;
 	
@@ -18,12 +20,12 @@
 	let userName:string=''
 	let points: number
 	let allowance: number
-	onMount(() => {
-		userid= localStorage.getItem('userid') || '';
-		userName = localStorage.getItem('userName') || '';
-		getUserRecord(userid)
-
-	});
+//	onMount(() => {
+//		userid= localStorage.getItem('userid') || '';
+//		userName = localStorage.getItem('userName') || '';
+//		getUserRecord(userid)
+//
+//	});
 
 	async function getUserRecord(userid: string) {
 		
@@ -81,10 +83,10 @@
 </script>
 
 {#if userRecord}
-<h1>Hi {userName}</h1>
+<h1>Hi {userRecord.name}</h1>
 <div class="mainContainer">
 	<div class="optionsContainer">
-		<div class="optionsItem"><h4>Points: {points}</h4></div>
+		<div class="optionsItem"><h4>Points: {userRecord.points}</h4></div>
 		{#if userRecord.isParent==false}
 		<div class="optionsItem"><h4>Allowance: {allowance}</h4></div>
 		{/if}

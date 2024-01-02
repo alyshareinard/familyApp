@@ -21,7 +21,8 @@ export async function load({ fetch }) {
 async function checkPassword(password: string, userid: string) {
     console.log("in checkpassword")
 	let message: string = '';
-	let user: Login;
+	let userFound=false
+    let user:Login
     const response = await kv.lrange('users', 0, -1);
 
     console.log("Value is ", response)
@@ -32,23 +33,26 @@ async function checkPassword(password: string, userid: string) {
 
 		if (value.id == userid) {
 			user = value;
+            userFound=true
             console.log("just found ", user)
 			break;
 		}
 	}
 	await tick;
 
-	if (user && password == user.password) {
-        const userRecord = await kv.get(user.id);
-        console.log("user record is ", userRecord)
+	if (userFound && password == user.password) {
+
+//        const userRecord = await kv.get(user.id);
+//        console.log("user record is ", userRecord)
 		message = 'Success';
 		return {
-			message: message,
-			userRecord
+			message,
+            passwordCorrect: true
 		};
 	} else {
 		return {
-			message: 'Password incorrect'
+			message: 'Password incorrect',
+            passwordCorrect:false
 		};
 	}
 }
@@ -70,13 +74,12 @@ export const actions = {
 		} else {
 			const response = await checkPassword(password, userid);
 
-            if (response.userRecord){
-                const userRecord = response.userRecord;
-                throw redirect(303, '/userpage');
+            if (response.passwordCorrect){
+            //    const userRecord = response.userRecord;
+                redirect(303, '/userpage');
             }
 			return {
 				message: response.message,
-				userRecord: response.userRecord
 				//userRecord
 			};
 		}

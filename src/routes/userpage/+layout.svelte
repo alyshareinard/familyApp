@@ -1,4 +1,7 @@
 <script lang="ts">
+
+	export let data: any;
+	console.log("data in layout.svelte", data)
 /*	import { onMount } from 'svelte';
 	import { userRecord } from '$lib/stores/UserStore';
 	import { goto } from '$app/navigation';
