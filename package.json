@@ -27,6 +27,7 @@
 	"dependencies": {
 		"@capacitor/core": "^5.5.1",
 		"@capacitor/ios": "^5.5.1",
+		"@sentry/sveltekit": "^7.91.0",
 		"@vercel/kv": "^1.0.0",
 		"@vercel/node": "^3.0.9"
 	}
